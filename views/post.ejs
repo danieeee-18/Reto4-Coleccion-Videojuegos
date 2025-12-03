@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+
+<article class="post-detail">
+    <h1><%= post.title %></h1>
+    
+    <p class="post-subtitle"><%= post.intro %></p>
+    
+    <div class="post-meta">
+        <a href="/category/<%= post.category %>"><%= post.category %></a>
+    </div>
+
+    <div class="post-body">
+        <%- post.content %>
+        
+        <% if (!post.content.includes('<img')) { %>
+            <div class="main-image-container">
+                 <img src="<%= post.image %>" alt="<%= post.title %>">
+            </div>
+        <% } %>
+    </div>
+
+</article>
+
+<%- include('partials/footer') %>

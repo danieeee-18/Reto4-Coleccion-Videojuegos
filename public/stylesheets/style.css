@@ -1,0 +1,175 @@
+@import "theme.css";
+@import "components.css";
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: white;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* === HERO SECTION === */
+/* === HERO SECTION === */
+.hero {
+    /* 1. Quitamos '?grayscale' para que sea a color */
+    /* 2. Cambiamos la URL a una imagen más nítida y colorida */
+    background-image: url('https://picsum.photos/1200/400'); 
+    background-size: cover;
+    background-position: center;
+    height: 250px;
+    position: relative;
+    display: flex;
+    align-items: flex-end; /* Texto abajo */
+}
+
+/* Sombra degradada: La hacemos más suave para que no oscurezca tanto la imagen */
+.hero::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    /* Degradado solo al final (último 30%) para que se lea el texto blanco */
+    background: linear-gradient(to bottom, transparent 70%, rgba(0,0,0,0.8));
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 20px 40px;
+    color: white;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin: 0;
+    font-weight: bold;
+    line-height: 1;
+    /* Sombra de texto para que se lea bien sobre cualquier fondo */
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+.hero p {
+    font-size: 1.1rem;
+    margin: 5px 0 0 0;
+    opacity: 1; /* Opacidad al 100% */
+    font-weight: normal;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+}
+/* TÍTULO BÁSICO CENTRADO */
+h2 {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    color: #222;
+    font-weight: bold;
+}
+
+/* FOOTER */
+footer#pie {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 50px;
+}
+/* === ESTILOS PÁGINA DE DETALLE (Post) === */
+
+.post-detail {
+    max-width: 900px; /* Ancho similar a la captura */
+    margin: 40px auto;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+
+.post-detail h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: #000;
+}
+
+.post-subtitle {
+    text-align: center;
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.post-meta {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.post-meta a {
+    color: #551a8b; /* Color morado enlace estándar o azul */
+    text-decoration: underline;
+    font-size: 0.9rem;
+}
+
+/* Estilos para el contenido HTML inyectado */
+.post-body {
+    line-height: 1.6;
+    font-size: 1rem;
+    text-align: justify; /* Texto justificado como en un artículo */
+}
+
+.post-body p {
+    margin-bottom: 20px;
+}
+
+.post-body strong {
+    font-weight: bold;
+}
+
+/* Imágenes dentro del post */
+.post-body img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 20px auto; /* Centrada */
+}
+
+/* === ESTILOS DE LA TABLA (Idéntica a la captura) === */
+.post-body table {
+    width: 100%;
+    max-width: 600px; /* No ocupar todo el ancho */
+    margin: 30px 0; /* Alineada a la izquierda/centro según margen */
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    border: 1px solid #333; /* Borde exterior negro */
+}
+
+/* Título de la tabla (si usas h4 antes de la tabla en el JSON) */
+.post-body h4 {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Celdas */
+.post-body th, 
+.post-body td {
+    border: 1px solid #333; /* Bordes negros finos */
+    padding: 8px 12px;
+    text-align: left;
+}
+
+/* Cabecera de la tabla */
+.post-body th {
+    font-weight: bold;
+    background-color: #fff; /* Fondo blanco */
+}
+
+/* Filas alternas o fondo blanco */
+.post-body tr {
+    background-color: #fff;
+}

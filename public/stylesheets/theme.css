@@ -1,0 +1,15 @@
+:root {
+    /* Nombres de variables iguales al proyecto del profesor */
+    --primary-background: #ffffff;       
+    --primary-color: #333333;       
+    --primary-background-hover: #e65100; /* Usado para botones hover */
+    
+    --secondary-background: #000000;     /* Para el menú */
+    --secondary-background-glass: rgba(0, 0, 0, 0.7); 
+    --secondary-background-hover: #1a1a1a; 
+
+    /* Variables extra para tu diseño */
+    --accent-color: #ff9800;
+    --text-white: #fff;
+    --max-width-page: 1200px;
+}

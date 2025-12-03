@@ -1,0 +1,18 @@
+<%- include('partials/header') %>
+
+    <h2>Ultimas entradas del blog</h2>
+
+    <div class="posts-grid">
+        <% posts.forEach(post => { %>
+            <article class="card">
+                <a href="/post/<%= post.id %>">
+                    <img src="<%= post.image %>" alt="<%= post.title %>">
+                    <div class="card-overlay">
+                        <h3><%= post.title %></h3>
+                    </div>
+                </a>
+            </article>
+        <% }) %>
+    </div>
+
+<%- include('partials/footer') %>
