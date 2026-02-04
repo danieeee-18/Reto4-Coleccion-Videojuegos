@@ -1,3 +1,60 @@
-<h1><%= title %></h1>
-<p>Bienvenido. Por favor inicia sesión.</p>
-<a href="/login"><button>Ir al Login</button></a>
+<!-- 
+  Página de inicio 
+  
+  Esta es la primera página que ven los usuarios al acceder a la aplicación.
+  Presenta la aplicación de forma atractiva y ofrece un call-to-action para iniciar sesión.
+-->
+
+<!-- Hero Section - Sección principal centrada -->
+<div class="container">
+  <div class="row min-vh-100 align-items-center justify-content-center">
+    <div class="col-lg-8 text-center fade-in">
+      <!-- Título principal con gradiente -->
+      <h1 class="display-1 fw-bold mb-4" style="line-height: 1.1;">
+        Game Collection
+      </h1>
+      
+      <!-- Subtítulo descriptivo -->
+      <p class="lead text-secondary mb-5" style="font-size: 1.5rem;">
+        Organiza y gestiona tu colección personal de videojuegos
+      </p>
+      
+      <!-- Call to Action - Botón principal -->
+      <div class="d-flex gap-3 justify-content-center">
+        <a href="/login" class="btn btn-primary btn-lg px-5 py-3 hover-lift">
+          <span style="font-size: 1.1rem;">Iniciar Sesión</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer decorativo -->
+<div class="container text-center py-4">
+  <p class="text-secondary small">
+    Node.js • Express • SQLite • Bootstrap
+  </p>
+</div>
+
+<!-- Estilos adicionales específicos para esta página -->
+<style>
+  /* Asegurar altura mínima para la primera sección */
+  .min-vh-100 {
+    min-height: 100vh;
+  }
+  
+  /* Mejorar el espaciado en móviles */
+  @media (max-width: 768px) {
+    .display-1 {
+      font-size: 3rem;
+    }
+    
+    .lead {
+      font-size: 1.2rem;
+    }
+    
+    .btn-lg {
+      padding: 0.75rem 2rem !important;
+    }
+  }
+</style>

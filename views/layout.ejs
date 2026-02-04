@@ -1,20 +1,37 @@
+<!--
+  Layout principal para páginas públicas
+  
+  Este layout se usa para las páginas públicas de la aplicación (index, login).
+  Incluye las meta tags necesarias, enlaces a Bootstrap y estilos personalizados.
+-->
 <!DOCTYPE html>
 <html lang="es">
   <head>
+    <!-- Meta tags esenciales -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Retro App</title>
+    <meta name="description" content="Game Collection - Gestiona tu colección personal de videojuegos de forma fácil y organizada">
+    <meta name="keywords" content="videojuegos, colección, gestión, gaming, organizar juegos">
+    <meta name="author" content="Game Collection">
     
-    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Título de la página -->
+    <title><%= locals.title || 'Game Collection' %> | Gestiona tu colección de videojuegos</title>
     
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Estilos personalizados -->
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
+  
   <body>
-    
+    <!-- Contenido principal de la página -->
     <main>
       <%- body %>
     </main>
 
-    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

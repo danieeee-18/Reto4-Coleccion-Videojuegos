@@ -1,0 +1,225 @@
+<!--
+  Página de Edición de Videojuego
+  
+  Formulario para editar los datos de un videojuego existente.
+  Incluye validación y diseño moderno.
+-->
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <!-- Breadcrumb de navegación -->
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="/admin" class="text-primary text-decoration-none">
+              <i class="bi bi-house-fill me-1"></i>
+              Mi Colección
+            </a>
+          </li>
+          <li class="breadcrumb-item active text-secondary" aria-current="page">
+            Editar Juego
+          </li>
+        </ol>
+      </nav>
+      
+      <!-- Card principal -->
+      <div class="card glass-effect shadow-lg fade-in">
+        <!-- Header -->
+        <div class="card-header py-4" style="background: var(--primary-gradient);">
+          <h3 class="text-white mb-0 fw-bold">
+            <i class="bi bi-pencil-square me-2"></i>
+            Editar: <%= juego.titulo %>
+          </h3>
+        </div>
+        
+        <!-- Body con formulario -->
+        <div class="card-body p-4 p-md-5">
+          <form action="/videojuegos/actualizar" method="POST" class="needs-validation" novalidate>
+            <!-- ID oculto -->
+            <input type="hidden" name="id" value="<%= juego.id %>">
+            
+            <!-- Título -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-controller me-1"></i>
+                Título del Juego *
+              </label>
+              <input 
+                type="text" 
+                name="titulo" 
+                class="form-control form-control-lg" 
+                value="<%= juego.titulo %>" 
+                placeholder="Ej: The Last of Us Part II"
+                required
+              >
+              <div class="invalid-feedback">
+                Por favor, introduce un título
+              </div>
+            </div>
+
+            <!-- Plataforma y Estado -->
+            <div class="row mb-4">
+              <div class="col-md-6 mb-3 mb-md-0">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-display me-1"></i>
+                  Plataforma *
+                </label>
+                <select name="plataforma" class="form-select form-select-lg" required>
+                  <option value="PC" <%= juego.plataforma === 'PC' ? 'selected' : '' %>>PC</option>
+                  <option value="PlayStation" <%= juego.plataforma === 'PlayStation' ? 'selected' : '' %>>PlayStation</option>
+                  <option value="Xbox" <%= juego.plataforma === 'Xbox' ? 'selected' : '' %>>Xbox</option>
+                  <option value="Nintendo" <%= juego.plataforma === 'Nintendo' ? 'selected' : '' %>>Nintendo</option>
+                </select>
+                <div class="invalid-feedback">
+                  Selecciona una plataforma
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-flag-fill me-1"></i>
+                  Estado *
+                </label>
+                <select name="estado" class="form-select form-select-lg" required>
+                  <option value="Pendiente" <%= juego.estado === 'Pendiente' ? 'selected' : '' %>>
+                    ⏳ Pendiente
+                  </option>
+                  <option value="Jugando" <%= juego.estado === 'Jugando' ? 'selected' : '' %>>
+                    🎮 Jugando
+                  </option>
+                  <option value="Terminado" <%= juego.estado === 'Terminado' ? 'selected' : '' %>>
+                    ✅ Terminado
+                  </option>
+                </select>
+                <div class="invalid-feedback">
+                  Selecciona un estado
+                </div>
+              </div>
+            </div>
+
+            <!-- Género -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-tag-fill me-1"></i>
+                Género
+              </label>
+              <input 
+                type="text" 
+                name="genero" 
+                class="form-control form-control-lg" 
+                value="<%= juego.genero %>"
+                placeholder="Ej: RPG, FPS, Aventura, Acción..."
+              >
+              <small class="text-secondary">
+                <i class="bi bi-info-circle me-1"></i>
+                Opcional - Ayuda a organizar mejor tu colección
+              </small>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="alert glass-effect border-0 mb-4">
+              <div class="d-flex align-items-start">
+                <i class="bi bi-calendar3 text-primary me-3" style="font-size: 1.5rem;"></i>
+                <div>
+                  <strong class="text-white">Fecha de creación:</strong>
+                  <p class="text-secondary mb-0">
+                    <%= new Date(juego.fecha_creacion).toLocaleDateString('es-ES', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    }) %>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="d-flex justify-content-between gap-3 flex-wrap">
+              <a href="/admin" class="btn btn-outline-light btn-lg px-4">
+                <i class="bi bi-x-lg me-2"></i>
+                Cancelar
+              </a>
+              <button type="submit" class="btn btn-success btn-lg px-5 hover-lift">
+                <i class="bi bi-check-lg me-2"></i>
+                Guardar Cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Información de ayuda -->
+      
+    </div>
+  </div>
+</div>
+
+<!-- Estilos adicionales -->
+<style>
+  /* Mejorar breadcrumb */
+  .breadcrumb {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    color: var(--text-secondary);
+  }
+  
+  /* Mejorar el aspecto de los selects */
+  .form-select option {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+  }
+  
+  /* Animación del botón de guardar */
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 242, 254, 0.4);
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .card-body {
+      padding: 2rem 1.5rem !important;
+    }
+    
+    .btn-lg {
+      padding: 0.75rem 2rem !important;
+    }
+  }
+</style>
+
+<!-- Script de validación -->
+<script>
+  // Validación de Bootstrap
+  (function() {
+    'use strict';
+    
+    const form = document.querySelector('.needs-validation');
+    
+    form.addEventListener('submit', function(event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      
+      form.classList.add('was-validated');
+    }, false);
+  })();
+  
+  // Confirmación antes de guardar
+  document.querySelector('form').addEventListener('submit', function(e) {
+    if (this.checkValidity()) {
+      const titulo = document.querySelector('input[name="titulo"]').value;
+      if (!confirm(`¿Guardar los cambios en "${titulo}"?`)) {
+        e.preventDefault();
+      }
+    }
+  });
+</script>

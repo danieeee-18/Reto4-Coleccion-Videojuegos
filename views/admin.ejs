@@ -1,4 +1,272 @@
-<h1>Hola, <%= user.email %></h1>
-<%- include('formulario-tarea') %>
-<hr>
-<%- include('listado-tareas') %>
+<!--
+  Panel de Administración - Vista principal
+  
+  Muestra la colección de videojuegos del usuario con opciones para:
+  - Filtrar por plataforma, género y estado
+  - Añadir nuevos videojuegos
+  - Editar y eliminar videojuegos existentes
+-->
+
+<div class="container py-4">
+  <!-- Encabezado con título y botón de añadir -->
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <h2 class="text-white fw-bold mb-0 fade-in">
+      <span style="font-size: 2rem; margin-right: 0.5rem;">🎮</span>
+      Mi Colección de Videojuegos
+    </h2>
+    <button class="btn btn-success hover-lift" type="button" data-bs-toggle="collapse" data-bs-target="#formNuevo">
+      <i class="bi bi-plus-lg me-2"></i>
+      Nuevo Juego
+    </button>
+  </div>
+
+  <!-- Panel de filtros -->
+  <div class="card mb-4 glass-effect slide-in">
+    <div class="card-body">
+      <h5 class="text-white mb-3">
+        <i class="bi bi-funnel-fill me-2"></i>
+        Filtrar Colección
+      </h5>
+      <form action="/admin" method="GET" class="row g-3 align-items-end">
+        <!-- Filtro por Plataforma -->
+        <div class="col-md-3 col-sm-6">
+          <label class="form-label">
+            <i class="bi bi-controller me-1"></i>
+            Plataforma
+          </label>
+          <select name="plataforma" class="form-select">
+            <option value="">Todas</option>
+            <option value="PC" <%= filtros.plataforma == 'PC' ? 'selected' : '' %>>PC</option>
+            <option value="PlayStation" <%= filtros.plataforma == 'PlayStation' ? 'selected' : '' %>>PlayStation</option>
+            <option value="Xbox" <%= filtros.plataforma == 'Xbox' ? 'selected' : '' %>>Xbox</option>
+            <option value="Nintendo" <%= filtros.plataforma == 'Nintendo' ? 'selected' : '' %>>Nintendo</option>
+          </select>
+        </div>
+        
+        <!-- Filtro por Género -->
+        <div class="col-md-3 col-sm-6">
+          <label class="form-label">
+            <i class="bi bi-tag-fill me-1"></i>
+            Género
+          </label>
+          <select name="genero" class="form-select">
+            <option value="">Todos</option>
+            <option value="RPG" <%= filtros.genero == 'RPG' ? 'selected' : '' %>>RPG</option>
+            <option value="FPS" <%= filtros.genero == 'FPS' ? 'selected' : '' %>>FPS</option>
+            <option value="Aventura" <%= filtros.genero == 'Aventura' ? 'selected' : '' %>>Aventura</option>
+            <option value="Acción" <%= filtros.genero == 'Acción' ? 'selected' : '' %>>Acción</option>
+            <option value="Estrategia" <%= filtros.genero == 'Estrategia' ? 'selected' : '' %>>Estrategia</option>
+            <option value="Deportes" <%= filtros.genero == 'Deportes' ? 'selected' : '' %>>Deportes</option>
+            <option value="Plataformas" <%= filtros.genero == 'Plataformas' ? 'selected' : '' %>>Plataformas</option>
+            <option value="Puzzle" <%= filtros.genero == 'Puzzle' ? 'selected' : '' %>>Puzzle</option>
+          </select>
+        </div>
+        
+        <!-- Filtro por Estado -->
+        <div class="col-md-3 col-sm-6">
+          <label class="form-label">
+            <i class="bi bi-flag-fill me-1"></i>
+            Estado
+          </label>
+          <select name="estado" class="form-select">
+            <option value="">Todos</option>
+            <option value="Pendiente" <%= filtros.estado == 'Pendiente' ? 'selected' : '' %>>Pendiente</option>
+            <option value="Jugando" <%= filtros.estado == 'Jugando' ? 'selected' : '' %>>Jugando</option>
+            <option value="Terminado" <%= filtros.estado == 'Terminado' ? 'selected' : '' %>>Terminado</option>
+          </select>
+        </div>
+        
+        <!-- Botones de acción -->
+        <div class="col-md-3 col-sm-6">
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary flex-grow-1">
+              <i class="bi bi-search me-1"></i>
+              Filtrar
+            </button>
+            <a href="/admin" class="btn btn-outline-light" title="Limpiar filtros">
+              <i class="bi bi-x-lg"></i>
+            </a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Formulario para añadir nuevo videojuego -->
+  <div class="collapse mb-4" id="formNuevo">
+    <div class="card glass-effect">
+      <div class="card-body p-4">
+        <h4 class="text-white mb-4">
+          <i class="bi bi-plus-circle-fill me-2"></i>
+          Añadir Nuevo Videojuego
+        </h4>
+        <form action="/videojuegos/insertar" method="POST" class="row g-3">
+          <!-- Título -->
+          <div class="col-md-6">
+            <label class="form-label">Título del juego *</label>
+            <input type="text" name="titulo" class="form-control" placeholder="Ej: The Last of Us Part II" required>
+          </div>
+          
+          <!-- Plataforma -->
+          <div class="col-md-3">
+            <label class="form-label">Plataforma *</label>
+            <select name="plataforma" class="form-select" required>
+              <option value="" disabled selected>Selecciona...</option>
+              <option value="PC">PC</option>
+              <option value="PlayStation">PlayStation</option>
+              <option value="Xbox">Xbox</option>
+              <option value="Nintendo">Nintendo</option>
+            </select>
+          </div>
+          
+          <!-- Género -->
+          <div class="col-md-3">
+            <label class="form-label">Género</label>
+            <input type="text" name="genero" class="form-control" placeholder="Ej: RPG, FPS, Aventura">
+          </div>
+          
+          <!-- Estado -->
+          <div class="col-md-6">
+            <label class="form-label">Estado *</label>
+            <select name="estado" class="form-select" required>
+              <option value="Pendiente">Pendiente</option>
+              <option value="Jugando">Jugando</option>
+              <option value="Terminado">Terminado</option>
+            </select>
+          </div>
+          
+          <!-- Botones -->
+          <div class="col-md-6 d-flex justify-content-end gap-2 align-items-end">
+            <button type="button" class="btn btn-outline-light" data-bs-toggle="collapse" data-bs-target="#formNuevo">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-success px-4">
+              <i class="bi bi-check-lg me-1"></i>
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid de videojuegos -->
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <% if (videojuegos.length > 0) { %>
+      <% videojuegos.forEach((juego, index) => { %>
+        <div class="col fade-in" style="animation-delay: <%= index * 0.05 %>s;">
+          <div class="card h-100 hover-lift">
+            <!-- Header de la card con badges -->
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span class="badge bg-dark">
+                <i class="bi bi-controller me-1"></i>
+                <%= juego.plataforma %>
+              </span>
+              <% 
+                let colorEstado = 'bg-secondary';
+                let iconoEstado = 'bi-clock';
+                if(juego.estado === 'Jugando') {
+                  colorEstado = 'bg-primary';
+                  iconoEstado = 'bi-play-fill';
+                }
+                if(juego.estado === 'Terminado') {
+                  colorEstado = 'bg-success';
+                  iconoEstado = 'bi-check-circle-fill';
+                }
+                if(juego.estado === 'Pendiente') {
+                  colorEstado = 'bg-warning text-dark';
+                  iconoEstado = 'bi-hourglass-split';
+                }
+              %>
+              <span class="badge <%= colorEstado %>">
+                <i class="<%= iconoEstado %> me-1"></i>
+                <%= juego.estado %>
+              </span>
+            </div>
+            
+            <!-- Cuerpo de la card -->
+            <div class="card-body">
+              <h5 class="card-title text-white fw-bold mb-2">
+                <%= juego.titulo %>
+              </h5>
+              <p class="text-secondary small mb-2">
+                <i class="bi bi-tag me-1"></i>
+                <%= juego.genero || 'Sin género' %>
+              </p>
+              <p class="text-muted" style="font-size: 0.75rem;">
+                <i class="bi bi-calendar3 me-1"></i>
+                Añadido: <%= new Date(juego.fecha_creacion).toLocaleDateString('es-ES') %>
+              </p>
+            </div>
+            
+            <!-- Footer con acciones -->
+            <div class="card-footer d-flex justify-content-end gap-2">
+              <a href="/videojuegos/editar/<%= juego.id %>" class="btn btn-sm btn-outline-light hover-lift">
+                <i class="bi bi-pencil-fill"></i>
+                <span class="d-none d-sm-inline ms-1">Editar</span>
+              </a>
+              
+              <form action="/videojuegos/eliminar" method="POST" class="d-inline" onsubmit="return confirm('¿Seguro que quieres eliminar <%= juego.titulo %>?');">
+                <input type="hidden" name="id" value="<%= juego.id %>">
+                <button type="submit" class="btn btn-sm btn-outline-danger hover-lift">
+                  <i class="bi bi-trash-fill"></i>
+                  <span class="d-none d-sm-inline ms-1">Borrar</span>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <!-- Mensaje cuando no hay juegos -->
+      <div class="col-12">
+        <div class="card glass-effect text-center py-5 fade-in">
+          <div class="card-body">
+            <div style="font-size: 5rem; margin-bottom: 1rem;">🎮</div>
+            <h3 class="text-white mb-3">No hay juegos en tu colección</h3>
+            <p class="text-secondary mb-4">
+              <% if (filtros.plataforma || filtros.genero || filtros.estado) { %>
+                No se encontraron juegos con los filtros seleccionados.
+                <br>
+                <a href="/admin" class="text-primary">Limpiar filtros</a>
+              <% } else { %>
+                ¡Empieza añadiendo tu primer videojuego!
+              <% } %>
+            </p>
+            <button class="btn btn-success btn-lg" type="button" data-bs-toggle="collapse" data-bs-target="#formNuevo">
+              <i class="bi bi-plus-lg me-2"></i>
+              Añadir Primer Juego
+            </button>
+          </div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+  
+  <!-- Estadísticas rápidas -->
+  <% if (videojuegos.length > 0) { %>
+    <div class="mt-5 text-center">
+      <p class="text-secondary">
+        <i class="bi bi-collection-fill me-2"></i>
+        Total de juegos: <strong class="text-white"><%= videojuegos.length %></strong>
+      </p>
+    </div>
+  <% } %>
+</div>
+
+<!-- Estilos adicionales para esta vista -->
+<style>
+  /* Mejorar el aspecto de los badges */
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.75rem;
+  }
+  
+  /* Transición suave para el collapse */
+  .collapsing {
+    transition: height 0.35s ease;
+  }
+  
+ 
+  
+</style>

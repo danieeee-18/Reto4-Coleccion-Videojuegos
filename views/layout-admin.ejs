@@ -1,42 +1,112 @@
+<!--
+  Layout para el panel de administración
+  
+  Este layout envuelve todas las páginas del área privada de la aplicación.
+  Incluye el navbar con navegación y la opción de cerrar sesión.
+-->
 <!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Panel de Administración</title>
+    <meta name="description" content="Panel de administración de Game Collection - Gestiona tu colección de videojuegos">
+    <title><%= locals.title || 'Panel de Administración' %> | Game Collection</title>
     
-    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Estilos personalizados -->
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
-  <body class="bg-light">
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+  
+  <body>
+    <!-- Navbar principal -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
       <div class="container">
-        <a class="navbar-brand" href="/tareas">Retro Admin</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <!-- Logo/Marca -->
+        <a class="navbar-brand d-flex align-items-center" href="/admin">
+          <span style="font-size: 1.5rem; margin-right: 0.5rem;">🎮</span>
+          <span>Game Collection</span>
+        </a>
+        
+        <!-- Botón hamburguesa para móviles -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
+        
+        <!-- Contenido del navbar -->
         <div class="collapse navbar-collapse" id="navbarNav">
+          <!-- Enlaces de navegación -->
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
-              <a class="nav-link active" href="/tareas">Tareas</a>
+              <a class="nav-link active" href="/admin">
+                <i class="bi bi-grid-fill me-1"></i>
+                Mi Colección
+              </a>
             </li>
           </ul>
-          <div class="d-flex">
-            <span class="navbar-text me-3">
-              <% if (locals.usuario) { %> Hola, <%= usuario.email %> <% } %>
+          
+          <!-- Información del usuario y logout -->
+          <div class="d-flex align-items-center gap-3">
+            <!-- Nombre del usuario -->
+            <span class="navbar-text text-secondary">
+              <i class="bi bi-person-circle me-2"></i>
+              <% if (locals.user) { %>
+                <span class="d-none d-md-inline">Hola, </span><strong class="text-white"><%= user.email %></strong>
+              <% } %>
             </span>
-            <a href="/logout" class="btn btn-outline-light btn-sm">Cerrar Sesión</a>
+            
+            <!-- Botón de cerrar sesión -->
+            <a href="/logout" class="btn btn-outline-light btn-sm hover-lift">
+              <i class="bi bi-box-arrow-right me-1"></i>
+              <span class="d-none d-md-inline">Cerrar Sesión</span>
+              <span class="d-md-none">Salir</span>
+            </a>
           </div>
         </div>
       </div>
     </nav>
 
-    <div class="container">
+    <!-- Contenido principal de la página -->
+    <main class="py-4">
       <%- body %>
-    </div>
+    </main>
 
-    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Footer -->
+    <footer class="mt-5 py-4 text-center" style="border-top: 1px solid rgba(255, 255, 255, 0.1);">
+      <div class="container">
+        <p class="text-secondary small mb-0">
+          Game Collection © 2026 • Desarrollado con Node.js + Express + SQLite
+        </p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Script para mejorar la experiencia de usuario -->
+    <script>
+      // Añadir clase 'active' al enlace actual
+      document.addEventListener('DOMContentLoaded', function() {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        navLinks.forEach(link => {
+          if (link.getAttribute('href') === currentPath) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+      });
+      
+      // Confirmación antes de cerrar sesión
+      document.querySelector('a[href="/logout"]').addEventListener('click', function(e) {
+        if (!confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+          e.preventDefault();
+        }
+      });
+    </script>
   </body>
 </html>
