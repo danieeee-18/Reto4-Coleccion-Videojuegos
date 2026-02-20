@@ -105,22 +105,36 @@ router.get('/admin', authMiddleware, (req, res) => {
  */
 router.post('/videojuegos/insertar', authMiddleware, (req, res) => {
     const { titulo, plataforma, genero, estado } = req.body;
+    const esAjax = req.headers['x-requested-with'] === 'XMLHttpRequest' ||
+                   (req.headers['accept'] && req.headers['accept'].includes('application/json'));
     
     // VALIDACIÓN: Verificar que los campos obligatorios no estén vacíos
     if (!titulo || !titulo.trim()) {
-        return res.status(400).send('El título es obligatorio');
+        return esAjax
+            ? res.status(400).json({ error: 'El título es obligatorio' })
+            : res.status(400).send('El título es obligatorio');
     }
     
     if (!plataforma || !PLATAFORMAS_VALIDAS.includes(plataforma)) {
-        return res.status(400).send('Plataforma no válida');
+        return esAjax
+            ? res.status(400).json({ error: 'Plataforma no válida' })
+            : res.status(400).send('Plataforma no válida');
     }
     
     if (!estado || !ESTADOS_VALIDOS.includes(estado)) {
-        return res.status(400).send('Estado no válido');
+        return esAjax
+            ? res.status(400).json({ error: 'Estado no válido' })
+            : res.status(400).send('Estado no válido');
     }
     
     // Insertar el videojuego en la base de datos
-    daoVideojuegos.insert(req.session.user.id, titulo.trim(), plataforma, genero || '', estado);
+    const resultado = daoVideojuegos.insert(req.session.user.id, titulo.trim(), plataforma, genero || '', estado);
+    
+    if (esAjax) {
+        // Para AJAX: devolver el juego recién creado como JSON
+        const nuevoJuego = daoVideojuegos.findById(resultado.lastInsertRowid);
+        return res.status(201).json({ ok: true, juego: nuevoJuego });
+    }
     
     // Redirigir de vuelta al panel de administración
     res.redirect('/admin');
@@ -196,30 +210,61 @@ router.get('/videojuegos/editar/:id', authMiddleware, (req, res) => {
 router.post('/videojuegos/actualizar', authMiddleware, (req, res) => {
     const { id, titulo, plataforma, genero, estado } = req.body;
     const idNum = parseInt(id);
+    const esAjax = req.headers['x-requested-with'] === 'XMLHttpRequest' ||
+                   (req.headers['accept'] && req.headers['accept'].includes('application/json'));
     
     // VALIDACIÓN: Verificar que el videojuego pertenece al usuario (HU1 - seguridad)
     if (!daoVideojuegos.belongsToUser(idNum, req.session.user.id)) {
-        return res.status(403).send('No tienes permiso para editar este videojuego');
+        return esAjax
+            ? res.status(403).json({ error: 'No tienes permiso para editar este videojuego' })
+            : res.status(403).send('No tienes permiso para editar este videojuego');
     }
     
     // VALIDACIÓN: Verificar que los campos obligatorios no estén vacíos
     if (!titulo || !titulo.trim()) {
-        return res.status(400).send('El título es obligatorio');
+        return esAjax
+            ? res.status(400).json({ error: 'El título es obligatorio' })
+            : res.status(400).send('El título es obligatorio');
     }
     
     if (!plataforma || !PLATAFORMAS_VALIDAS.includes(plataforma)) {
-        return res.status(400).send('Plataforma no válida');
+        return esAjax
+            ? res.status(400).json({ error: 'Plataforma no válida' })
+            : res.status(400).send('Plataforma no válida');
     }
     
     if (!estado || !ESTADOS_VALIDOS.includes(estado)) {
-        return res.status(400).send('Estado no válido');
+        return esAjax
+            ? res.status(400).json({ error: 'Estado no válido' })
+            : res.status(400).send('Estado no válido');
     }
     
     // Actualizar el videojuego en la base de datos
     daoVideojuegos.update(idNum, titulo.trim(), plataforma, genero || '', estado);
     
+    if (esAjax) {
+        // Para AJAX: devolver el juego actualizado como JSON
+        const juegoActualizado = daoVideojuegos.findById(idNum);
+        return res.status(200).json({ ok: true, juego: juegoActualizado });
+    }
+    
     // Redirigir de vuelta al panel de administración
     res.redirect('/admin');
+});
+
+/**
+ * GET /api/videojuegos - API para obtener videojuegos (para AJAX/favoritos)
+ * Devuelve los videojuegos del usuario en formato JSON.
+ * Query params opcionales: plataforma, genero, estado
+ */
+router.get('/api/videojuegos', authMiddleware, (req, res) => {
+    const filtros = {
+        plataforma: req.query.plataforma || '',
+        genero: req.query.genero || '',
+        estado: req.query.estado || ''
+    };
+    const juegos = daoVideojuegos.findAll(req.session.user.id, filtros);
+    res.json(juegos);
 });
 
 module.exports = router;

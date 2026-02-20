@@ -3,31 +3,35 @@
   
   Muestra la colección de videojuegos del usuario con opciones para:
   - Filtrar por plataforma, género y estado
-  - Añadir nuevos videojuegos
+  - Ver solo favoritos (LocalStorage)
+  - Añadir nuevos videojuegos (AJAX)
   - Editar y eliminar videojuegos existentes
 -->
 
 <div class="container py-4">
   <!-- Encabezado con título y botón de añadir -->
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-    <h2 class="text-white fw-bold mb-0 fade-in">
+    <h2 class="text-white fw-bold mb-0 fade-in" id="titulo-vista">
       <span style="font-size: 2rem; margin-right: 0.5rem;">🎮</span>
       Mi Colección de Videojuegos
     </h2>
-    <button class="btn btn-success hover-lift" type="button" data-bs-toggle="collapse" data-bs-target="#formNuevo">
+    <button class="btn btn-success hover-lift" type="button" data-bs-toggle="collapse" data-bs-target="#formNuevo" id="btn-nuevo-juego">
       <i class="bi bi-plus-lg me-2"></i>
       Nuevo Juego
     </button>
   </div>
 
-  <!-- Panel de filtros -->
-  <div class="card mb-4 glass-effect slide-in">
+  <!-- Alerta de feedback AJAX (oculta por defecto) -->
+  <div id="ajax-feedback" class="alert mb-3" role="alert" style="display:none !important;"></div>
+
+  <!-- Panel de filtros (se oculta en vista de favoritos) -->
+  <div class="card mb-4 glass-effect slide-in" id="panel-filtros">
     <div class="card-body">
       <h5 class="text-white mb-3">
         <i class="bi bi-funnel-fill me-2"></i>
         Filtrar Colección
       </h5>
-      <form action="/admin" method="GET" class="row g-3 align-items-end">
+      <form action="/admin" method="GET" class="row g-3 align-items-end" id="form-filtros">
         <!-- Filtro por Plataforma -->
         <div class="col-md-3 col-sm-6">
           <label class="form-label">
@@ -92,7 +96,7 @@
     </div>
   </div>
 
-  <!-- Formulario para añadir nuevo videojuego -->
+  <!-- Formulario AJAX para añadir nuevo videojuego -->
   <div class="collapse mb-4" id="formNuevo">
     <div class="card glass-effect">
       <div class="card-body p-4">
@@ -100,17 +104,20 @@
           <i class="bi bi-plus-circle-fill me-2"></i>
           Añadir Nuevo Videojuego
         </h4>
-        <form action="/videojuegos/insertar" method="POST" class="row g-3">
+        <!-- Mensaje de error/éxito dentro del formulario -->
+        <div id="form-insertar-msg" class="alert mb-3" role="alert" style="display:none;"></div>
+
+        <form id="form-insertar" class="row g-3" novalidate>
           <!-- Título -->
           <div class="col-md-6">
             <label class="form-label">Título del juego *</label>
-            <input type="text" name="titulo" class="form-control" placeholder="Ej: The Last of Us Part II" required>
+            <input type="text" name="titulo" id="ins-titulo" class="form-control" placeholder="Ej: The Last of Us Part II" required>
           </div>
           
           <!-- Plataforma -->
           <div class="col-md-3">
             <label class="form-label">Plataforma *</label>
-            <select name="plataforma" class="form-select" required>
+            <select name="plataforma" id="ins-plataforma" class="form-select" required>
               <option value="" disabled selected>Selecciona...</option>
               <option value="PC">PC</option>
               <option value="PlayStation">PlayStation</option>
@@ -122,13 +129,13 @@
           <!-- Género -->
           <div class="col-md-3">
             <label class="form-label">Género</label>
-            <input type="text" name="genero" class="form-control" placeholder="Ej: RPG, FPS, Aventura">
+            <input type="text" name="genero" id="ins-genero" class="form-control" placeholder="Ej: RPG, FPS, Aventura">
           </div>
           
           <!-- Estado -->
           <div class="col-md-6">
             <label class="form-label">Estado *</label>
-            <select name="estado" class="form-select" required>
+            <select name="estado" id="ins-estado" class="form-select" required>
               <option value="Pendiente">Pendiente</option>
               <option value="Jugando">Jugando</option>
               <option value="Terminado">Terminado</option>
@@ -140,7 +147,7 @@
             <button type="button" class="btn btn-outline-light" data-bs-toggle="collapse" data-bs-target="#formNuevo">
               Cancelar
             </button>
-            <button type="submit" class="btn btn-success px-4">
+            <button type="submit" class="btn btn-success px-4" id="btn-guardar-insertar">
               <i class="bi bi-check-lg me-1"></i>
               Guardar
             </button>
@@ -150,11 +157,28 @@
     </div>
   </div>
 
+  <!-- Mensaje de vista de favoritos vacíos (oculto por defecto) -->
+  <div id="msg-sin-favoritos" style="display:none;" class="col-12 mb-4">
+    <div class="card glass-effect text-center py-5 fade-in">
+      <div class="card-body">
+        <div style="font-size: 5rem; margin-bottom: 1rem;">⭐</div>
+        <h3 class="text-white mb-3">No tienes favoritos aún</h3>
+        <p class="text-secondary mb-4">
+          Marca tus juegos favoritos pulsando el icono <i class="bi bi-star"></i> en cada tarjeta.
+        </p>
+        <button class="btn btn-primary btn-lg" id="btn-ver-todos-desde-fav">
+          <i class="bi bi-grid-fill me-2"></i>
+          Ver Todos los Juegos
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Grid de videojuegos -->
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="grid-juegos">
     <% if (videojuegos.length > 0) { %>
       <% videojuegos.forEach((juego, index) => { %>
-        <div class="col fade-in" style="animation-delay: <%= index * 0.05 %>s;">
+        <div class="col fade-in juego-card" style="animation-delay: <%= index * 0.05 %>s;" data-id="<%= juego.id %>">
           <div class="card h-100 hover-lift">
             <!-- Header de la card con badges -->
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -162,26 +186,37 @@
                 <i class="bi bi-controller me-1"></i>
                 <%= juego.plataforma %>
               </span>
-              <% 
-                let colorEstado = 'bg-secondary';
-                let iconoEstado = 'bi-clock';
-                if(juego.estado === 'Jugando') {
-                  colorEstado = 'bg-primary';
-                  iconoEstado = 'bi-play-fill';
-                }
-                if(juego.estado === 'Terminado') {
-                  colorEstado = 'bg-success';
-                  iconoEstado = 'bi-check-circle-fill';
-                }
-                if(juego.estado === 'Pendiente') {
-                  colorEstado = 'bg-warning text-dark';
-                  iconoEstado = 'bi-hourglass-split';
-                }
-              %>
-              <span class="badge <%= colorEstado %>">
-                <i class="<%= iconoEstado %> me-1"></i>
-                <%= juego.estado %>
-              </span>
+              <div class="d-flex align-items-center gap-2">
+                <% 
+                  let colorEstado = 'bg-secondary';
+                  let iconoEstado = 'bi-clock';
+                  if(juego.estado === 'Jugando') {
+                    colorEstado = 'bg-primary';
+                    iconoEstado = 'bi-play-fill';
+                  }
+                  if(juego.estado === 'Terminado') {
+                    colorEstado = 'bg-success';
+                    iconoEstado = 'bi-check-circle-fill';
+                  }
+                  if(juego.estado === 'Pendiente') {
+                    colorEstado = 'bg-warning text-dark';
+                    iconoEstado = 'bi-hourglass-split';
+                  }
+                %>
+                <span class="badge <%= colorEstado %>">
+                  <i class="<%= iconoEstado %> me-1"></i>
+                  <%= juego.estado %>
+                </span>
+                <!-- Botón de favorito -->
+                <button
+                  class="btn-fav"
+                  data-id="<%= juego.id %>"
+                  title="Marcar como favorito"
+                  aria-label="Favorito"
+                >
+                  <i class="bi bi-star-fill"></i>
+                </button>
+              </div>
             </div>
             
             <!-- Cuerpo de la card -->
@@ -206,7 +241,7 @@
                 <span class="d-none d-sm-inline ms-1">Editar</span>
               </a>
               
-              <form action="/videojuegos/eliminar" method="POST" class="d-inline" onsubmit="return confirm('¿Seguro que quieres eliminar <%= juego.titulo %>?');">
+              <form action="/videojuegos/eliminar" method="POST" class="d-inline form-eliminar" data-titulo="<%= juego.titulo %>">
                 <input type="hidden" name="id" value="<%= juego.id %>">
                 <button type="submit" class="btn btn-sm btn-outline-danger hover-lift">
                   <i class="bi bi-trash-fill"></i>
@@ -219,7 +254,7 @@
       <% }) %>
     <% } else { %>
       <!-- Mensaje cuando no hay juegos -->
-      <div class="col-12">
+      <div class="col-12" id="msg-sin-juegos">
         <div class="card glass-effect text-center py-5 fade-in">
           <div class="card-body">
             <div style="font-size: 5rem; margin-bottom: 1rem;">🎮</div>
@@ -245,10 +280,10 @@
   
   <!-- Estadísticas rápidas -->
   <% if (videojuegos.length > 0) { %>
-    <div class="mt-5 text-center">
+    <div class="mt-5 text-center" id="stats-juegos">
       <p class="text-secondary">
         <i class="bi bi-collection-fill me-2"></i>
-        Total de juegos: <strong class="text-white"><%= videojuegos.length %></strong>
+        Total de juegos: <strong class="text-white" id="total-juegos"><%= videojuegos.length %></strong>
       </p>
     </div>
   <% } %>
@@ -266,7 +301,65 @@
   .collapsing {
     transition: height 0.35s ease;
   }
-  
- 
-  
+
+  /* ---- Botón de Favorito ---- */
+  .btn-fav {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.25);
+    transition: color 0.2s, transform 0.2s;
+    line-height: 1;
+  }
+
+  .btn-fav:hover {
+    color: #ffd93d;
+    transform: scale(1.2);
+  }
+
+  .btn-fav.favorito {
+    color: #ffd93d;
+    text-shadow: 0 0 8px rgba(255, 217, 61, 0.5);
+  }
+
+  /* Tarjeta favorita con borde dorado */
+  .juego-card.es-favorito .card {
+    border-color: rgba(255, 217, 61, 0.45) !important;
+    box-shadow: 0 4px 20px rgba(255, 217, 61, 0.12);
+  }
+
+  /* Ocultación suave de tarjetas */
+  .juego-card.oculto {
+    display: none !important;
+  }
+
+  /* Feedback AJAX */
+  #ajax-feedback.visible {
+    display: block !important;
+  }
+  #ajax-feedback.alert-success {
+    background: rgba(0, 242, 254, 0.15);
+    color: #00f2fe;
+    border-left: 4px solid #00f2fe;
+  }
+  #ajax-feedback.alert-danger {
+    background: rgba(255, 107, 107, 0.15);
+    color: #ff6b6b;
+    border-left: 4px solid #ff6b6b;
+  }
+  #form-insertar-msg.alert-success {
+    background: rgba(0, 242, 254, 0.15);
+    color: #00f2fe;
+    border-left: 4px solid #00f2fe;
+    display: block;
+  }
+  #form-insertar-msg.alert-danger {
+    background: rgba(255, 107, 107, 0.15);
+    color: #ff6b6b;
+    border-left: 4px solid #ff6b6b;
+    display: block;
+  }
 </style>

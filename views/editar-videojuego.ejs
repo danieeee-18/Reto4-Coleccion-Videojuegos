@@ -2,7 +2,7 @@
   Página de Edición de Videojuego
   
   Formulario para editar los datos de un videojuego existente.
-  Incluye validación y diseño moderno.
+  Usa AJAX para enviar los cambios sin recargar la página.
 -->
 
 <div class="container py-5">
@@ -35,7 +35,11 @@
         
         <!-- Body con formulario -->
         <div class="card-body p-4 p-md-5">
-          <form action="/videojuegos/actualizar" method="POST" class="needs-validation" novalidate>
+
+          <!-- Mensaje de feedback AJAX -->
+          <div id="editar-msg" class="alert mb-4" role="alert" style="display:none;"></div>
+
+          <form id="form-editar" class="needs-validation" novalidate>
             <!-- ID oculto -->
             <input type="hidden" name="id" value="<%= juego.id %>">
             
@@ -48,6 +52,7 @@
               <input 
                 type="text" 
                 name="titulo" 
+                id="edit-titulo"
                 class="form-control form-control-lg" 
                 value="<%= juego.titulo %>" 
                 placeholder="Ej: The Last of Us Part II"
@@ -65,7 +70,7 @@
                   <i class="bi bi-display me-1"></i>
                   Plataforma *
                 </label>
-                <select name="plataforma" class="form-select form-select-lg" required>
+                <select name="plataforma" id="edit-plataforma" class="form-select form-select-lg" required>
                   <option value="PC" <%= juego.plataforma === 'PC' ? 'selected' : '' %>>PC</option>
                   <option value="PlayStation" <%= juego.plataforma === 'PlayStation' ? 'selected' : '' %>>PlayStation</option>
                   <option value="Xbox" <%= juego.plataforma === 'Xbox' ? 'selected' : '' %>>Xbox</option>
@@ -81,7 +86,7 @@
                   <i class="bi bi-flag-fill me-1"></i>
                   Estado *
                 </label>
-                <select name="estado" class="form-select form-select-lg" required>
+                <select name="estado" id="edit-estado" class="form-select form-select-lg" required>
                   <option value="Pendiente" <%= juego.estado === 'Pendiente' ? 'selected' : '' %>>
                     ⏳ Pendiente
                   </option>
@@ -107,6 +112,7 @@
               <input 
                 type="text" 
                 name="genero" 
+                id="edit-genero"
                 class="form-control form-control-lg" 
                 value="<%= juego.genero %>"
                 placeholder="Ej: RPG, FPS, Aventura, Acción..."
@@ -137,11 +143,11 @@
 
             <!-- Botones de acción -->
             <div class="d-flex justify-content-between gap-3 flex-wrap">
-              <a href="/admin" class="btn btn-outline-light btn-lg px-4">
+              <a href="/admin" class="btn btn-outline-light btn-lg px-4" id="btn-cancelar-editar">
                 <i class="bi bi-x-lg me-2"></i>
                 Cancelar
               </a>
-              <button type="submit" class="btn btn-success btn-lg px-5 hover-lift">
+              <button type="submit" class="btn btn-success btn-lg px-5 hover-lift" id="btn-guardar-editar">
                 <i class="bi bi-check-lg me-2"></i>
                 Guardar Cambios
               </button>
@@ -149,9 +155,6 @@
           </form>
         </div>
       </div>
-      
-      <!-- Información de ayuda -->
-      
     </div>
   </div>
 </div>
@@ -183,6 +186,20 @@
     box-shadow: 0 8px 24px rgba(0, 242, 254, 0.4);
   }
   
+  /* Mensajes AJAX */
+  #editar-msg.alert-success {
+    background: rgba(0, 242, 254, 0.15);
+    color: #00f2fe;
+    border-left: 4px solid #00f2fe;
+    display: block;
+  }
+  #editar-msg.alert-danger {
+    background: rgba(255, 107, 107, 0.15);
+    color: #ff6b6b;
+    border-left: 4px solid #ff6b6b;
+    display: block;
+  }
+
   /* Responsive */
   @media (max-width: 768px) {
     .card-body {
@@ -195,31 +212,64 @@
   }
 </style>
 
-<!-- Script de validación -->
+<!-- Script AJAX para el formulario de edición -->
 <script>
-  // Validación de Bootstrap
-  (function() {
-    'use strict';
-    
-    const form = document.querySelector('.needs-validation');
-    
-    form.addEventListener('submit', function(event) {
-      if (!form.checkValidity()) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-      
+(function() {
+  'use strict';
+
+  const form = document.getElementById('form-editar');
+  const msgDiv = document.getElementById('editar-msg');
+  const btnGuardar = document.getElementById('btn-guardar-editar');
+
+  function mostrarMensaje(texto, tipo) {
+    msgDiv.textContent = texto;
+    msgDiv.className = 'alert alert-' + tipo;
+    msgDiv.style.display = 'block';
+    // Auto-ocultar mensajes de éxito tras 3 s
+    if (tipo === 'success') {
+      setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+    }
+  }
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    // Validación HTML5
+    if (!form.checkValidity()) {
       form.classList.add('was-validated');
-    }, false);
-  })();
-  
-  // Confirmación antes de guardar
-  document.querySelector('form').addEventListener('submit', function(e) {
-    if (this.checkValidity()) {
-      const titulo = document.querySelector('input[name="titulo"]').value;
-      if (!confirm(`¿Guardar los cambios en "${titulo}"?`)) {
-        e.preventDefault();
+      return;
+    }
+
+    btnGuardar.disabled = true;
+    btnGuardar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+
+    const datos = new FormData(form);
+    const body = new URLSearchParams(datos);
+
+    try {
+      const respuesta = await fetch('/videojuegos/actualizar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: body.toString()
+      });
+
+      const json = await respuesta.json();
+
+      if (!respuesta.ok) {
+        mostrarMensaje(json.error || 'Error al guardar los cambios', 'danger');
+      } else {
+        mostrarMensaje('✅ Cambios guardados correctamente. Volviendo a la colección...', 'success');
+        setTimeout(() => { window.location.href = '/admin'; }, 1800);
       }
+    } catch (err) {
+      mostrarMensaje('Error de conexión. Inténtalo de nuevo.', 'danger');
+    } finally {
+      btnGuardar.disabled = false;
+      btnGuardar.innerHTML = '<i class="bi bi-check-lg me-2"></i>Guardar Cambios';
     }
   });
+})();
 </script>

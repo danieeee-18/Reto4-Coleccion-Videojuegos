@@ -5,9 +5,7 @@
  * incluyendo variables CSS, estilos base, componentes y animaciones.
  */
 
-/* ============================================
-   VARIABLES CSS - Sistema de Diseño
-   ============================================ */
+
 :root {
   /* Paleta de colores principal - Gradientes vibrantes */
   --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -539,4 +537,55 @@ a:hover {
   background: var(--bg-dark);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--border-radius-lg);
+}
+
+/* ============================================
+   FAVORITOS
+   ============================================ */
+
+.btn-fav {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.2);
+  transition: color 0.2s ease, transform 0.2s ease;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-fav:hover {
+  color: #ffd93d;
+  transform: scale(1.25);
+}
+
+.btn-fav.favorito {
+  color: #ffd93d;
+  text-shadow: 0 0 8px rgba(255, 217, 61, 0.6);
+}
+
+.juego-card.es-favorito .card {
+  border-color: rgba(255, 217, 61, 0.4) !important;
+  box-shadow: 0 4px 24px rgba(255, 217, 61, 0.1);
+}
+
+/* ============================================
+   SPINNER (AJAX buttons)
+   ============================================ */
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15em;
+}
+
+/* ============================================
+   NAV-LINK ACTIVO
+   ============================================ */
+
+.nav-link.active {
+  color: var(--text-primary) !important;
 }
